@@ -34,7 +34,7 @@ def process_video():
             segment = original_video.subclip(start_time, end_time)
             segment_filename = f"segment_{i+1}.mp4"
             output_path = os.path.join(output_dir, segment_filename)
-            segment.write_videofile(output_path, codec="libx264", audio_codec="aac")
+            segment.write_videofile(output_path, codec="libx264", audio_codec="aac",threads=4)
 
         original_video.close()
 
