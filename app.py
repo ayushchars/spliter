@@ -6,9 +6,15 @@ from moviepy.editor import VideoFileClip, TextClip, CompositeVideoClip
 from werkzeug.utils import secure_filename
 import zipfile
 from io import BytesIO
+from PIL import Image  # Add this
+
+# Patch to replace the deprecated ANTIALIAS with LANCZOS
+if hasattr(Image, 'ANTIALIAS'):
+    Image.Resampling = Image  # Ensure Resampling is defined
+    Image.ANTIALIAS = Image.Resampling.LANCZOS  # Patch ANTIALIAS
 
 app = Flask(__name__)
-CORS(app) 
+CORS(app)
 
 UPLOAD_FOLDER = './uploads'
 OUTPUT_FOLDER = './output'
