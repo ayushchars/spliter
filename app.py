@@ -1,14 +1,16 @@
 import os
 import shutil
 from flask import Flask, request, jsonify, send_file
-from flask_cors import CORS  # Import CORS
+from flask_cors import CORS
 from moviepy.editor import VideoFileClip
-import tempfile  # For creating temporary directories
+import tempfile
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for the entire app
+CORS(app)
 
-# Endpoint to process the video and zip the output
+# Set max upload size (optional, adjust as needed)
+app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 500MB limit
+
 @app.route('/process-video', methods=['POST'])
 def process_video():
     if 'video' not in request.files:
@@ -32,9 +34,11 @@ def process_video():
             start_time = i * segment_duration
             end_time = min((i + 1) * segment_duration, total_duration)
             segment = original_video.subclip(start_time, end_time)
+            # Resize video to optimize performance, adjust resolution as needed
+            segment = segment.resize(newsize=(640, 360))
             segment_filename = f"segment_{i+1}.mp4"
             output_path = os.path.join(output_dir, segment_filename)
-            segment.write_videofile(output_path, codec="libx264", audio_codec="aac",threads=4)
+            segment.write_videofile(output_path, codec="libx264", audio_codec="aac", threads=4)
 
         original_video.close()
 
